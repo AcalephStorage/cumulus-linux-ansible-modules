@@ -61,6 +61,15 @@ options:
     mstpctl_bpduguard:
         description:
             - Enables BPDU Guard on a port in vlan-aware mode
+    mstpctl_portadminedge:
+        description:
+            - Enables/disables the initial edge state of the port in bridge.
+    bond_lacp_bypass_allow:
+        description:
+            - allows a bond configured in 802.3ad mode to become active and forward traffic even when there is no LACP partner.
+    bond_use_carrier:
+        description:
+            - How to determine link state.
     mstpctl_portnetwork:
         description:
             - Enables bridge assurance in vlan-aware mode
@@ -144,6 +153,9 @@ cl_bond:
   virtual_mac: "{{ item.value.virtual_mac|default(omit) }}"
   mstpctl_portnetwork: "{{ item.value.mstpctl_portnetwork|default('no') }}"
   mstpctl_bpduguard: "{{ item.value.mstpctl_bpduguard|default('no') }}"
+  mstpctl_portadminedge: "{{ item.value.mstpctl_portadminedge|default('no') }}"
+  bond_lacp_bypass_allow: "{{ item.value.bond_lacp_bypass_allow|default(omit) }}"
+  bond_use_carrier: "{{ item.value.bond_use_carrier|default(omit) }}
 with_dict: cl_bonds
 notify: reload networking
 
@@ -305,7 +317,7 @@ def build_desired_iface_config(module):
     build_alias_name(module)
     build_vrr(module)
     for _attr in ['mtu', 'mstpctl_portnetwork',
-                  'mstpctl_bpduguard', 'clag_id']:
+                  'mstpctl_bpduguard', 'clag_id', 'mstpctl_portadminedge', 'bond_lacp_bypass_allow', 'bond_use_carrier']:
         build_generic_attr(module, _attr)
 
 
@@ -372,6 +384,9 @@ def main():
             pvid=dict(type='str'),
             mstpctl_portnetwork=dict(type='bool', choices=BOOLEANS),
             mstpctl_bpduguard=dict(type='bool', choices=BOOLEANS),
+            mstpctl_portadminedge=dict(type='bool', choices=BOOLEANS),
+            bond_use_carrier=dict(type='str'),
+            bond_lacp_bypass_allow=dict(type='str'),
             clag_id=dict(type='str'),
             min_links=dict(type='int', default=1),
             mode=dict(type='str', default='802.3ad'),

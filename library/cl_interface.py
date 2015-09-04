@@ -80,6 +80,10 @@ options:
             - Integer that changes the role the switch has in the clag domain.
               The lower priority switch will assume the primary role. The number
               can be between 0 and 65535
+    clagd_backup_ip:
+        description:
+            - Backup link in the event the peering link goes down. 
+              Cumulus Networks recommends you use the switch's management IP address for this purpose. 
     clagd_peer_ip:
         description:
             - IP address of the directly connected peer switch interface
@@ -137,6 +141,7 @@ cl_interface:
   speed: "{{ item.value.link_speed|default(omit) }}"
   mtu: "{{ item.value.mtu|default(omit) }}"
   clagd_enable: "{{ item.value.clagd_enable|default(omit) }}"
+  clagd_backup_ip: "{{ item.value.clagd_backup_ip|default(omit) }}"
   clagd_peer_ip: "{{ item.value.clagd_peer_ip|default(omit) }}"
   clagd_sys_mac: "{{ item.value.clagd_sys_mac|default(omit) }}"
   clagd_priority: "{{ item.value.clagd_priority|default(omit) }}"
@@ -301,7 +306,7 @@ def build_desired_iface_config(module):
     for _attr in ['mtu', 'mstpctl_portnetwork',
                   'mstpctl_bpduguard', 'clagd_enable',
                   'clagd_priority', 'clagd_peer_ip',
-                  'clagd_sys_mac', 'clagd_args']:
+                  'clagd_sys_mac', 'clagd_args', 'clagd_backup_ip']:
         build_generic_attr(module, _attr)
 
 
@@ -370,6 +375,7 @@ def main():
             mstpctl_bpduguard=dict(type='bool', choices=BOOLEANS),
             clagd_enable=dict(type='bool', choices=BOOLEANS),
             clagd_priority=dict(type='str'),
+            clagd_backup_ip=dict(type='str'),
             clagd_peer_ip=dict(type='str'),
             clagd_sys_mac=dict(type='str'),
             clagd_args=dict(type='str'),
