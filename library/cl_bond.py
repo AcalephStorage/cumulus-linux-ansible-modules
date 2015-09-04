@@ -63,13 +63,13 @@ options:
             - Enables BPDU Guard on a port in vlan-aware mode
     mstpctl_portadminedge:
         description:
-            - Enables/disables the initial edge state of the port in bridge.
+            - Enables/disables the initial edge state of the port in bridge
     bond_lacp_bypass_allow:
         description:
             - allows a bond configured in 802.3ad mode to become active and forward traffic even when there is no LACP partner.
     bond_use_carrier:
         description:
-            - How to determine link state.
+            - How to determine link state
     mstpctl_portnetwork:
         description:
             - Enables bridge assurance in vlan-aware mode
