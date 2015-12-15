@@ -87,6 +87,9 @@ options:
     clagd_peer_ip:
         description:
             - IP address of the directly connected peer switch interface
+    netmask:
+        description:
+            - ipv4 address subnet mask.
     clagd_sys_mac:
         description:
             - Clagd system mac address. Recommended to use the range starting
@@ -134,6 +137,7 @@ notify: reload networking
 # with just the options you want.
 cl_interface:
   name: "{{ item.key }}"
+  netmask: "{{ item.value.netmask|default(omit) }}"
   ipv4: "{{ item.value.ipv4|default(omit) }}"
   ipv6: "{{ item.value.ipv6|default(omit) }}"
   alias_name: "{{ item.value.alias_name|default(omit) }}"
@@ -150,6 +154,7 @@ cl_interface:
   virtual_mac: "{{ item.value.virtual_mac|default(omit) }}"
   mstpctl_portnetwork: "{{ item.value.mstpctl_portnetwork|default('no') }}"
   mstpctl_bpduguard: "{{ item.value.mstpctl_bpduguard|default('no') }}"
+  address_virtual: "{{ item.value.address_virtual|default(omit) }}"
 with_dict: cl_interfaces
 notify: reload networking
 
@@ -303,10 +308,10 @@ def build_desired_iface_config(module):
     build_speed(module)
     build_alias_name(module)
     build_vrr(module)
-    for _attr in ['mtu', 'mstpctl_portnetwork',
+    for _attr in ['netmask', 'mtu', 'mstpctl_portnetwork',
                   'mstpctl_bpduguard', 'clagd_enable',
                   'clagd_priority', 'clagd_peer_ip',
-                  'clagd_sys_mac', 'clagd_args', 'clagd_backup_ip']:
+                  'clagd_sys_mac', 'clagd_args', 'clagd_backup_ip', 'address_virtual']:
         build_generic_attr(module, _attr)
 
 
@@ -360,6 +365,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True, type='str'),
+            netmask=dict(type='str'),
             ipv4=dict(type='list'),
             ipv6=dict(type='list'),
             alias_name=dict(type='str'),
@@ -379,6 +385,7 @@ def main():
             clagd_peer_ip=dict(type='str'),
             clagd_sys_mac=dict(type='str'),
             clagd_args=dict(type='str'),
+            address_virtual=dict(type='str'),
             location=dict(type='str',
                           default='/etc/network/interfaces.d')
         ),
